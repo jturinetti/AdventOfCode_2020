@@ -15,13 +15,25 @@ namespace Problem2
                 return;
             }
 
-            var parsedInputs = new List<PasswordPolicyContainer>();
+            var parsedInputs = new List<BasePasswordPolicy>();
 
             using (StreamReader fileStream = new StreamReader(new FileInfo(args[0]).OpenRead()))
             {
                 while (fileStream.Peek() >= 0)
                 {
-                    parsedInputs.Add(new PasswordPolicyContainer(fileStream.ReadLine()));
+                    if (args[1] == "1")
+                    {
+                        parsedInputs.Add(new PasswordRangeOccurrencePolicy(fileStream.ReadLine()));
+                    }
+                    else if (args[1] == "2")
+                    {
+                        parsedInputs.Add(new PasswordIndexOccurrencePolicy(fileStream.ReadLine()));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Provide problem part (1 or 2).");
+                        return;
+                    }
                 }
             }
 
@@ -30,19 +42,46 @@ namespace Problem2
         }
     }
 
-    class PasswordPolicyContainer
+    abstract class BasePasswordPolicy
     {
-        public PasswordPolicyContainer(string input)
+        public BasePasswordPolicy(string input)
         {
             ParseInput(input);
         }
 
-        public char PolicyLetter { get; private set; }
-        public int MinimumOccurrences { get; private set; }
-        public int MaximumOccurrences { get; private set; }
-        public string Password { get; private set; }
+        public char PolicyLetter { get; protected set; }
+        public string Password { get; protected set; }
+        public int Parameter1 { get; protected set; }
+        public int Parameter2 { get; protected set; }
 
-        public bool PasswordMeetsPolicy()
+        private void ParseInput(string input)
+        {            
+            var splitInput = input.Split(' ');
+            var ranges = splitInput[0].Split('-');
+            Parameter1 = Convert.ToInt32(ranges[0]);
+            Parameter2 = Convert.ToInt32(ranges[1]);
+            PolicyLetter = splitInput[1][0];
+            Password = splitInput[2];
+        }
+
+        public abstract bool PasswordMeetsPolicy();
+    }
+
+    class PasswordIndexOccurrencePolicy : BasePasswordPolicy
+    {
+        public PasswordIndexOccurrencePolicy(string input) : base(input) { }
+
+        public override bool PasswordMeetsPolicy()
+        {
+            return Password[Parameter1 - 1] == PolicyLetter ^ Password[Parameter2 - 1] == PolicyLetter;
+        }
+    }
+
+    class PasswordRangeOccurrencePolicy : BasePasswordPolicy
+    {
+        public PasswordRangeOccurrencePolicy(string input) : base(input) { }        
+
+        public override bool PasswordMeetsPolicy()
         {
             var policyLetterFound = Password.GroupBy(x => x)
                 .Select(x => new {
@@ -53,18 +92,8 @@ namespace Problem2
                 .TryGetValue(PolicyLetter, out var occurrencesForPolicyLetter);
             
             return policyLetterFound 
-                    && occurrencesForPolicyLetter >= MinimumOccurrences 
-                    && occurrencesForPolicyLetter <= MaximumOccurrences;
-        }
-
-        private void ParseInput(string input)
-        {
-            var splitInput = input.Split(' ');
-            var ranges = splitInput[0].Split('-');
-            MinimumOccurrences = Convert.ToInt32(ranges[0]);
-            MaximumOccurrences = Convert.ToInt32(ranges[1]);
-            PolicyLetter = splitInput[1][0];
-            Password = splitInput[2];
-        }
+                    && occurrencesForPolicyLetter >= Parameter1 
+                    && occurrencesForPolicyLetter <= Parameter2;
+        }        
     }
 }
