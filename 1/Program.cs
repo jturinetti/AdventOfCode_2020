@@ -24,6 +24,12 @@ namespace Problem1
                 }                
             }            
 
+            // TwoNumberSolution(inputList);
+            ThreeNumberSolution(inputList);
+        }
+
+        private static void TwoNumberSolution(List<int> inputList)
+        {
             var firstNumberIndex = 0;
             while (firstNumberIndex < inputList.Count - 1)
             {
@@ -39,7 +45,32 @@ namespace Problem1
                     }
                 }
                 firstNumberIndex++;
-            }
+            }       
+        }
+
+        private static void ThreeNumberSolution(List<int> inputList)
+        {
+            var firstNumberIndex = 0;
+            while (firstNumberIndex < inputList.Count - 2)
+            {
+                for (int secondNumberIndex = firstNumberIndex + 1; secondNumberIndex < inputList.Count - 1; secondNumberIndex++)
+                {
+                    for (int thirdNumberIndex = secondNumberIndex + 1; thirdNumberIndex < inputList.Count; thirdNumberIndex++)
+                    {
+                        var num1 = inputList[firstNumberIndex];
+                        var num2 = inputList[secondNumberIndex];
+                        var num3 = inputList[thirdNumberIndex];
+
+                        if (num1 + num2 + num3 == 2020)
+                        {
+                            Console.WriteLine(num1 * num2 * num3);
+                            return;
+                        }
+                    }
+                    secondNumberIndex++;                    
+                }
+                firstNumberIndex++;
+            }       
         }
     }
 }
