@@ -37,7 +37,7 @@ namespace Problem3
                 new Slope(1, 2)
             };
 
-            var results = new List<int>();
+            var results = new List<long>();
             foreach (var slope in slopes)
             {
                 results.Add(CountTreesForSlope(slope));
