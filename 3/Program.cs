@@ -7,6 +7,9 @@ namespace Problem3
 {
     class Program
     {
+        private static List<string> mapRows;
+        private const char Tree = '#';
+
         static void Main(string[] args)
         {
             if (args == null || args.Length == 0)
@@ -15,7 +18,7 @@ namespace Problem3
                 return;
             }
 
-            var mapRows = new List<string>();
+            mapRows = new List<string>();
 
             using (StreamReader fileStream = new StreamReader(new FileInfo(args[0]).OpenRead()))
             {
@@ -25,19 +28,35 @@ namespace Problem3
                 }
             }
 
+            var slopes = new List<Slope>
+            {
+                new Slope(1, 1),
+                new Slope(3, 1),
+                new Slope(5, 1),
+                new Slope(7, 1),
+                new Slope(1, 2)
+            };
+
+            var results = new List<int>();
+            foreach (var slope in slopes)
+            {
+                results.Add(CountTreesForSlope(slope));
+            }
+
+            Console.WriteLine(results.Aggregate((a, b) => a * b));
+        }
+
+        private static int CountTreesForSlope(Slope slope)
+        {
             var currentRow = 0;
             var currentColumn = 0;
             var treeHitCounter = 0;
             var totalProvidedColumns = mapRows.First().Length;
 
-            const int SlopeX = 3;
-            const int SlopeY = 1;
-            const char Tree = '#';
-
-            while (currentRow < mapRows.Count - SlopeY)
+            while (currentRow < mapRows.Count - slope.Y)
             {
-                currentColumn += SlopeX;
-                currentRow += SlopeY;
+                currentColumn += slope.X;
+                currentRow += slope.Y;
 
                 if (mapRows[currentRow][currentColumn % totalProvidedColumns] == Tree)
                 {                    
@@ -45,7 +64,26 @@ namespace Problem3
                 }
             }
 
-            Console.WriteLine(treeHitCounter);
+            Console.WriteLine("{0} hits for slope {1}", treeHitCounter, slope);
+
+            return treeHitCounter;
+        }
+    }
+
+    class Slope
+    {
+        public Slope(int x, int y)
+        {
+            X = x;
+            Y = y;
+        } 
+
+        public int X { get; }
+        public int Y { get; }
+
+        public override string ToString()
+        {
+            return string.Format("X:{0} Y:{1}", X, Y);
         }
     }
 }
