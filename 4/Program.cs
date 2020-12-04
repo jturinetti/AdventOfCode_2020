@@ -37,7 +37,7 @@ namespace Problem4
                     }
 
                     Console.WriteLine(passport);
-                    
+
                     if (passport.IsPassportValid())
                     {
                         validPassportCount++;
@@ -75,7 +75,7 @@ namespace Problem4
             // "cid"    this field can be missing
         };
 
-        private Dictionary<string, string> passportFields = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> passportFields = new Dictionary<string, string>();
 
         public void AddPassportField(string key, string value)
         {
@@ -84,7 +84,7 @@ namespace Problem4
 
         public void AddPassportFields(Dictionary<string, string> fields)
         {            
-            foreach(var field in fields)
+            foreach (var field in fields)
             {
                 passportFields.Add(field.Key, field.Value);
             }            
