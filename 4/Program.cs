@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Problem4
 {
@@ -32,8 +33,8 @@ namespace Problem4
                             break;
                         }
                         
-                        var inputDictionary = ParsePassportInput(passportLine);                        
-                        passport.AddPassportFields(inputDictionary);
+                        var inputList = ParsePassportInput(passportLine);
+                        passport.AddPassportFields(inputList);
                     }
 
                     Console.WriteLine(passport);
@@ -48,16 +49,149 @@ namespace Problem4
             Console.WriteLine("Valid passports: {0}", validPassportCount);
         }
 
-        private static Dictionary<string, string> ParsePassportInput(string line)
+        private static List<PassportField> ParsePassportInput(string line)
         {
-            var retDictionary = new Dictionary<string, string>();
+            var retList = new List<PassportField>();
             var parseLineEntries = line.Split(' ');
             foreach (var entry in parseLineEntries)
             {
                 var kvp = entry.Split(':');
-                retDictionary.Add(kvp[0], kvp[1]);
+                retList.Add(new PassportField(kvp[0], kvp[1]));
             }
-            return retDictionary;
+            return retList;
+        }
+    }
+
+    class PassportField
+    {
+        public string FieldKey { get; }
+        public string FieldValue { get; }
+        public bool IsValid { get; private set; }
+        private PassportFieldValidatorFactory validatorFactory;
+
+        public PassportField(string key, string value)
+        {
+            FieldKey = key;
+            FieldValue = value;
+
+            validatorFactory = new PassportFieldValidatorFactory();
+            IsValid = validatorFactory.CreateValidator(key).IsPassportFieldValid(value);
+        }
+    }
+
+    class PassportFieldValidatorFactory
+    {
+        public IPassportFieldValidator CreateValidator(string fieldKey)
+        {
+            switch (fieldKey)
+            {
+                case "byr":
+                    return new ByrValidator();
+                case "iyr":
+                    return new IyrValidator();
+                case "eyr":
+                    return new EyrValidator();
+                case "hgt":
+                    return new HgtValidator();
+                case "hcl":
+                    return new HclValidator();
+                case "ecl":
+                    return new EclValidator();
+                case "pid":
+                    return new PidValidator();
+                default:
+                    return new DefaultValidator();
+            }
+        } 
+    }
+
+    interface IPassportFieldValidator
+    {
+        bool IsPassportFieldValid(string value);
+    }
+
+    class DefaultValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return true;
+        }
+    }
+
+    class ByrValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return value.Length == 4 
+                && int.TryParse(value, out int year) 
+                && year >= 1920 
+                && year <= 2002;
+        }
+    }
+
+    class IyrValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return value.Length == 4 
+                && int.TryParse(value, out int year) 
+                && year >= 2010 
+                && year <= 2020;
+        }
+    }
+
+    class EyrValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return value.Length == 4 
+                && int.TryParse(value, out int year) 
+                && year >= 2020 
+                && year <= 2030;
+        }
+    }
+
+    class HgtValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            var parsedUnit = value.Substring(value.Length - 2);
+            var parsedHeight = value.Substring(0, value.Length - 2);
+
+            if (parsedUnit == "cm")
+            {
+                return int.TryParse(parsedHeight, out int height) && height >= 150 && height <= 193;
+            }
+            else if (parsedUnit == "in")
+            {
+                return int.TryParse(parsedHeight, out int height) && height >= 59 && height <= 76;
+            }
+
+            return false;
+        }
+    }
+
+    class HclValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return Regex.IsMatch(value, "#([0-9a-f]){6}");
+        }
+    }
+    
+    class EclValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return Regex.IsMatch(value, "amb|blu|brn|gry|grn|hzl|oth");
+        }
+    }
+
+    class PidValidator : IPassportFieldValidator
+    {
+        public bool IsPassportFieldValid(string value)
+        {
+            return value.Length == 9 && int.TryParse(value, out _);
         }
     }
 
@@ -72,22 +206,14 @@ namespace Problem4
             "hcl",
             "ecl",
             "pid",
-            // "cid"    this field can be missing
+            // "cid"    this field is optional
         };
 
-        private readonly Dictionary<string, string> passportFields = new Dictionary<string, string>();
+        private readonly List<PassportField> passportFields = new List<PassportField>();
 
-        public void AddPassportField(string key, string value)
+        public void AddPassportFields(List<PassportField> fields)
         {
-            passportFields.Add(key, value);
-        }
-
-        public void AddPassportFields(Dictionary<string, string> fields)
-        {            
-            foreach (var field in fields)
-            {
-                passportFields.Add(field.Key, field.Value);
-            }            
+            passportFields.AddRange(fields);
         }
 
         public bool IsPassportValid()
@@ -95,7 +221,9 @@ namespace Problem4
             var isValid = true;
             foreach (var field in requiredPassportFields)
             {
-                isValid = isValid && passportFields.ContainsKey(field);
+                isValid = isValid 
+                    && passportFields.Exists(f => f.FieldKey == field)
+                    && passportFields.Single(f => f.FieldKey == field).IsValid;
             }
             return isValid;
         }
@@ -105,7 +233,7 @@ namespace Problem4
             var str = "";
             foreach (var field in passportFields)
             {
-                str += string.Format("{0} : {1}\n", field.Key, field.Value);
+                str += string.Format("{0} : {1}\n", field.FieldKey, field.FieldValue);
             }
             return str;
         }
