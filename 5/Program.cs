@@ -17,6 +17,7 @@ namespace Problem5
             }
 
             var maximumSeatId = 0;
+            var seatIdList = new List<int>();
 
             using (StreamReader fileStream = new StreamReader(new FileInfo(args[0]).OpenRead()))
             {
@@ -27,21 +28,30 @@ namespace Problem5
                     var row = boardingPassEntry.Substring(0, 7);
                     var column = boardingPassEntry.Substring(7);
 
-                    var rowByte = Convert.ToByte(row, 2);
-                    Console.WriteLine(rowByte);
-
+                    var rowByte = Convert.ToByte(row, 2);                    
                     var columnByte = Convert.ToByte(column, 2);
-                    Console.WriteLine(columnByte);
+                    
                     var seatId = (rowByte * 8) + columnByte;
-                    Console.WriteLine("Seat ID: {0}", seatId);
-
-                    if (seatId > maximumSeatId)
-                    {
-                        maximumSeatId = seatId;
-                    }
+                    seatIdList.Add(seatId);
                 }
 
-                Console.WriteLine("Maximum Seat ID: {0}", maximumSeatId);
+                seatIdList.Sort();
+                var index = 1;
+
+                while (index < seatIdList.Count - 2)
+                {
+                    var currentSeatId = seatIdList[index];
+                    if (currentSeatId - seatIdList[index - 1] != 1)
+                    {
+                        Console.WriteLine("My Seat ID: {0}", currentSeatId - 1);
+                        break;
+                    }                    
+
+                    index++;
+                }
+                
+                Console.WriteLine("Maximum Seat ID: {0}", seatIdList.Last());
+                                
             }
         }
 
