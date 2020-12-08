@@ -28,6 +28,7 @@ namespace AocSolution
             }
 
             Console.WriteLine(graph.BagTraversal("shiny gold"));
+            Console.WriteLine(graph.ContainedBagCount("shiny gold"));
         }
     }
 
@@ -43,6 +44,17 @@ namespace AocSolution
         public int BagTraversal(string bagName)
         {
             return nodeDict.Keys.Where(bagKey => BagTraversalRec(nodeDict[bagKey], bagName)).Count();
+        }
+
+        public int ContainedBagCount(string bagName)
+        {
+            var specifiedBag = nodeDict[bagName];
+            return specifiedBag.ContainedBags.Sum(b => ContainedBagCountRec(b.BagName, 1, b.BagCount));
+        }
+
+        private int ContainedBagCountRec(string bagName, int parentBagCount, int currentBagCount)
+        {            
+            return parentBagCount * (currentBagCount + nodeDict[bagName].ContainedBags.Sum(b => ContainedBagCountRec(b.BagName, currentBagCount, b.BagCount)));
         }
 
         private bool BagTraversalRec(BagNode currentNode, string bagName)
@@ -79,7 +91,7 @@ namespace AocSolution
                     BagCount = Convert.ToInt32(splitInput[inputIndex]),
                     BagName = splitInput[inputIndex + 1] + " " + splitInput[inputIndex + 2]
                 });
-                
+                                
                 inputIndex = inputIndex + 4;
             }
 
