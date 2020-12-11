@@ -45,6 +45,39 @@ namespace AocSolution
             Console.WriteLine("1 jolt diffs: {0}", oneJoltDiffs);
             Console.WriteLine("3 jolt diffs: {0}", threeJoltDiffs);
             Console.WriteLine(oneJoltDiffs * threeJoltDiffs);
+
+            currentIndex = 0;
+            var total = 0;
+            
+            while (currentIndex < joltages.Count)
+            {
+                var done = false;
+                var innerIndex = currentIndex + 1;
+                var incrementer = 0;
+                while (innerIndex < joltages.Count && !done)
+                {
+                    if (joltages[innerIndex] - joltages[currentIndex] <= 3)
+                    {
+                        incrementer++;
+                    }
+                    else
+                    {
+                        done = true;
+                    }
+                    innerIndex++;
+                }
+
+                currentIndex++;
+                if (total == 0) {
+                    total = incrementer;
+                }
+                else
+                {
+                    total *= incrementer;
+                }
+                // total *= incrementer;
+            }
+            Console.WriteLine(total);
         }
     }
 }
