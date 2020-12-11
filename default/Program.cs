@@ -16,15 +16,9 @@ namespace AocSolution
                 return;
             }
 
-            // TODO
+            var inputData = File.ReadAllLines(args[0]);
 
-            using (StreamReader fileStream = new StreamReader(new FileInfo(args[0]).OpenRead()))
-            {
-                while (fileStream.Peek() >= 0)
-                {
-                    // TODO
-                }
-            }
+            // TODO
         }
     }
 }
