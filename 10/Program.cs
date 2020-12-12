@@ -8,6 +8,8 @@ namespace AocSolution
 {
     class Program
     {
+        static Dictionary<long, int> cache = new Dictionary<long, int>();
+
         static void Main(string[] args)
         {
             if (args == null || args.Length == 0)
@@ -46,38 +48,32 @@ namespace AocSolution
             Console.WriteLine("3 jolt diffs: {0}", threeJoltDiffs);
             Console.WriteLine(oneJoltDiffs * threeJoltDiffs);
 
-            currentIndex = 0;
-            var total = 0;
-            
-            while (currentIndex < joltages.Count)
-            {
-                var done = false;
-                var innerIndex = currentIndex + 1;
-                var incrementer = 0;
-                while (innerIndex < joltages.Count && !done)
-                {
-                    if (joltages[innerIndex] - joltages[currentIndex] <= 3)
-                    {
-                        incrementer++;
-                    }
-                    else
-                    {
-                        done = true;
-                    }
-                    innerIndex++;
-                }
+            // Console.WriteLine(CountAdapterPermutations(joltages);
+        }
 
-                currentIndex++;
-                if (total == 0) {
-                    total = incrementer;
+        private static long CountAdapterPermutations(List<int> joltages, int currentIndex)
+        {
+            long result = 0;
+            var currentNumber = joltages[currentIndex];
+            var offset = currentIndex + 1;
+            var diffExceeded = false;
+            while (!diffExceeded)
+            {
+                if (joltages[offset] - joltages[currentIndex] <= 3)
+                {
+                    result += ProcessJoltageIndex(joltages, offset);
+                    offset++;
                 }
                 else
                 {
-                    total *= incrementer;
+                    diffExceeded = true;
                 }
-                // total *= incrementer;
             }
-            Console.WriteLine(total);
+        }
+
+        private static long ProcessJoltageIndex(List<int> joltages, int currentIndex)
+        {
+            // if (cache.Contains())
         }
     }
 }
