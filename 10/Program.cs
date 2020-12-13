@@ -27,7 +27,7 @@ namespace AocSolution
 
             while (currentIndex < joltages.Count - 1)
             {
-                Console.WriteLine(joltages[currentIndex]);
+                // Console.WriteLine(joltages[currentIndex]);
                 var diff = joltages[currentIndex + 1] - joltages[currentIndex];
                 if (diff == 1)
                 {
@@ -47,50 +47,34 @@ namespace AocSolution
             Console.WriteLine("1 jolt diffs: {0}", oneJoltDiffs);
             Console.WriteLine("3 jolt diffs: {0}", threeJoltDiffs);
             Console.WriteLine(oneJoltDiffs * threeJoltDiffs);
-
+            
+            // need to add the 0 value to the beginning of the array to correctly calculate all the paths
+            joltages.Insert(0, 0);
             Console.WriteLine(ProcessJoltageIndex(joltages, 0));
-        }
-
-        
+        }        
 
         private static long ProcessJoltageIndex(List<int> joltages, int currentIndex)
         {
-            // if (cache.ContainsKey(currentIndex))
-            // {
-            //     Console.WriteLine("cache entry found for " + currentIndex);
-            //     return cache[currentIndex];
-            // }
-
-            if (currentIndex >= joltages.Count)
+            if (currentIndex == joltages.Count - 1)
             {
-                // Console.WriteLine("done with this tree for index " + currentIndex);
                 return 1;
             }
 
-            // Console.WriteLine("current index " + currentIndex);
-
-            var currentNumber = joltages[currentIndex];
-            long result = ProcessJoltageIndex(joltages, currentIndex + 1);
-            // if (!cache.ContainsKey(currentIndex + 1))
-            // {
-            //     cache.Add(currentIndex, result);
-            // }
-            
-            // Console.WriteLine(result);
-
-            if (currentIndex + 2 < joltages.Count && joltages[currentIndex + 2] - currentNumber <= 3)
+            if (cache.ContainsKey(currentIndex))
             {
-                // Console.WriteLine(joltages[currentIndex + 2] + " - " + currentNumber);
-                // Console.WriteLine("adding val 2 spots away from " + currentIndex);
-                result += ProcessJoltageIndex(joltages, currentIndex + 2);
+                return cache[currentIndex];
             }
 
-            if (currentIndex + 3 < joltages.Count && joltages[currentIndex + 3] - currentNumber <= 3)
+            long result = 0;
+            for (int i = currentIndex + 1; i < joltages.Count; i++)
             {
-                // Console.WriteLine(joltages[currentIndex + 3] + " - " + currentNumber);
-                // Console.WriteLine("adding val 3 spots away from " + currentIndex);
-                result += ProcessJoltageIndex(joltages, currentIndex + 3);
-            }            
+                if (joltages[i] - joltages[currentIndex] <= 3)
+                {
+                    result += ProcessJoltageIndex(joltages, i);
+                }
+            }
+
+            cache.TryAdd(currentIndex, result);
 
             return result;
         }
