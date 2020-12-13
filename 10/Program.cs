@@ -8,7 +8,7 @@ namespace AocSolution
 {
     class Program
     {
-        static Dictionary<long, int> cache = new Dictionary<long, int>();
+        static Dictionary<int, long> cache = new Dictionary<int, long>();
 
         static void Main(string[] args)
         {
@@ -48,32 +48,51 @@ namespace AocSolution
             Console.WriteLine("3 jolt diffs: {0}", threeJoltDiffs);
             Console.WriteLine(oneJoltDiffs * threeJoltDiffs);
 
-            // Console.WriteLine(CountAdapterPermutations(joltages);
+            Console.WriteLine(ProcessJoltageIndex(joltages, 0));
         }
 
-        private static long CountAdapterPermutations(List<int> joltages, int currentIndex)
-        {
-            long result = 0;
-            var currentNumber = joltages[currentIndex];
-            var offset = currentIndex + 1;
-            var diffExceeded = false;
-            while (!diffExceeded)
-            {
-                if (joltages[offset] - joltages[currentIndex] <= 3)
-                {
-                    result += ProcessJoltageIndex(joltages, offset);
-                    offset++;
-                }
-                else
-                {
-                    diffExceeded = true;
-                }
-            }
-        }
+        
 
         private static long ProcessJoltageIndex(List<int> joltages, int currentIndex)
         {
-            // if (cache.Contains())
+            // if (cache.ContainsKey(currentIndex))
+            // {
+            //     Console.WriteLine("cache entry found for " + currentIndex);
+            //     return cache[currentIndex];
+            // }
+
+            if (currentIndex >= joltages.Count)
+            {
+                // Console.WriteLine("done with this tree for index " + currentIndex);
+                return 1;
+            }
+
+            // Console.WriteLine("current index " + currentIndex);
+
+            var currentNumber = joltages[currentIndex];
+            long result = ProcessJoltageIndex(joltages, currentIndex + 1);
+            // if (!cache.ContainsKey(currentIndex + 1))
+            // {
+            //     cache.Add(currentIndex, result);
+            // }
+            
+            // Console.WriteLine(result);
+
+            if (currentIndex + 2 < joltages.Count && joltages[currentIndex + 2] - currentNumber <= 3)
+            {
+                // Console.WriteLine(joltages[currentIndex + 2] + " - " + currentNumber);
+                // Console.WriteLine("adding val 2 spots away from " + currentIndex);
+                result += ProcessJoltageIndex(joltages, currentIndex + 2);
+            }
+
+            if (currentIndex + 3 < joltages.Count && joltages[currentIndex + 3] - currentNumber <= 3)
+            {
+                // Console.WriteLine(joltages[currentIndex + 3] + " - " + currentNumber);
+                // Console.WriteLine("adding val 3 spots away from " + currentIndex);
+                result += ProcessJoltageIndex(joltages, currentIndex + 3);
+            }            
+
+            return result;
         }
     }
 }
