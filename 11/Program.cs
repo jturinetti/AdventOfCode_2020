@@ -30,9 +30,11 @@ namespace AocSolution
                 sb.Append(s);
             }
 
-            Console.WriteLine("Starting seat map:");
-
+            Console.WriteLine("Row Length: {0}", rowLength);
             var seatConfiguration = sb.ToString().ToCharArray();
+            Console.WriteLine("String Length: {0}", seatConfiguration.Length);
+            
+            Console.WriteLine("Starting seat map:");
             PrintSeatConfiguration(seatConfiguration, rowLength);
 
             Console.WriteLine(DetermineOccupiedSeats(seatConfiguration, rowLength, 1));
@@ -79,8 +81,8 @@ namespace AocSolution
             var occupiedSeatFound = false;
             var topIndex = index - rowLength;
             var bottomIndex = index + rowLength;
-            var isLeftColumn = index % 10 == 0;
-            var isRightColumn = (index + 1) % 10 == 0;
+            var isLeftColumn = index % rowLength == 0;
+            var isRightColumn = (index + 1) % rowLength == 0;
 
             occupiedSeatFound = 
                 // left
@@ -107,8 +109,8 @@ namespace AocSolution
         {
             var topIndex = index - rowLength;
             var bottomIndex = index + rowLength;
-            var isLeftColumn = index % 10 == 0;
-            var isRightColumn = (index + 1) % 10 == 0;
+            var isLeftColumn = index % rowLength== 0;
+            var isRightColumn = (index + 1) % rowLength == 0;
 
             var indicesToCheck = new List<int>();
             
