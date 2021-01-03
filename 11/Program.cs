@@ -37,10 +37,11 @@ namespace AocSolution
             Console.WriteLine("Starting seat map:");
             PrintSeatConfiguration(seatConfiguration, rowLength);
 
-            Console.WriteLine(DetermineOccupiedSeats(seatConfiguration, rowLength, 1));
+            // Console.WriteLine(DetermineOccupiedSeats(seatConfiguration, rowLength, 1));
+            Console.WriteLine("Part 1: " + DetermineOccupiedSeats(seatConfiguration, rowLength, 1, IsEmptySeatNowOccupiedPart1, 4));
         }
 
-        private static int DetermineOccupiedSeats(char[] seatConfiguration, int rowLength, int iteration)
+        private static int DetermineOccupiedSeats(char[] seatConfiguration, int rowLength, int iteration, Func<char[], int, int, char> emptySeatOccupiedAlg, int occupiedSeatThreshold)
         {
             Console.WriteLine();
             Console.WriteLine($"Starting iteration {iteration}.");
@@ -53,11 +54,11 @@ namespace AocSolution
                 char toAppend = FLOOR;
                 if (seatConfiguration[index] == EMPTY_SEAT)
                 {
-                    toAppend = IsEmptySeatNowOccupied(seatConfiguration, index, rowLength);
+                    toAppend = emptySeatOccupiedAlg(seatConfiguration, index, rowLength);
                 }
                 else if (seatConfiguration[index] == OCCUPIED_SEAT)
                 {
-                    toAppend = IsOccupiedSeatNowEmpty(seatConfiguration, index, rowLength);
+                    toAppend = IsOccupiedSeatNowEmpty(seatConfiguration, index, rowLength, occupiedSeatThreshold);
                 }
 
                 updatedSeatConfiguration[index] = toAppend;
@@ -73,10 +74,16 @@ namespace AocSolution
                 return updatedSeatConfiguration.Count(c => c == OCCUPIED_SEAT);
             }
 
-            return DetermineOccupiedSeats(updatedSeatConfiguration, rowLength, ++iteration);
+            return DetermineOccupiedSeats(updatedSeatConfiguration, rowLength, ++iteration, emptySeatOccupiedAlg, occupiedSeatThreshold);
         }
 
-        private static char IsEmptySeatNowOccupied(char[] seatConfiguration, int index, int rowLength)
+        private static char IsEmptySeatNowOccupiedPart2(char[] seatConfiguration, int index, int rowLength)
+        {
+            // TODO
+            return '-';
+        }
+
+        private static char IsEmptySeatNowOccupiedPart1(char[] seatConfiguration, int index, int rowLength)
         {
             var occupiedSeatFound = false;
             var topIndex = index - rowLength;
@@ -105,7 +112,7 @@ namespace AocSolution
             return occupiedSeatFound ? EMPTY_SEAT : OCCUPIED_SEAT;
         }
 
-        private static char IsOccupiedSeatNowEmpty(char[] seatConfiguration, int index, int rowLength)
+        private static char IsOccupiedSeatNowEmpty(char[] seatConfiguration, int index, int rowLength, int occupiedSeatThreshold)
         {
             var topIndex = index - rowLength;
             var bottomIndex = index + rowLength;
@@ -131,7 +138,7 @@ namespace AocSolution
             // bottom
             if (IsValidIndex(bottomIndex, seatConfiguration.Length)) indicesToCheck.Add(bottomIndex);
             
-            return indicesToCheck.Count(i => seatConfiguration[i] == OCCUPIED_SEAT) >= 4 ? EMPTY_SEAT : OCCUPIED_SEAT;
+            return indicesToCheck.Count(i => seatConfiguration[i] == OCCUPIED_SEAT) >= occupiedSeatThreshold ? EMPTY_SEAT : OCCUPIED_SEAT;
         }
 
         private static bool IsValidIndex(int index, int seatConfigLength)
